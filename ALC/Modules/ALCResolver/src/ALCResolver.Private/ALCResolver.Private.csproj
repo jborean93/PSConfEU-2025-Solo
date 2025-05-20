@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net472;net8.0</TargetFrameworks>
+    <LangVersion>10.0</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--
+    Any dep we reference here will automatically be loaded in our ALC.
+    -->
+    <PackageReference Include="Tomlyn" Version="0.19.0" />
+
+    <!--
+    Allows our main module to access any internals inside this assembly.
+    -->
+    <InternalsVisibleTo Include="ALCResolver" />
+  </ItemGroup>
+</Project>

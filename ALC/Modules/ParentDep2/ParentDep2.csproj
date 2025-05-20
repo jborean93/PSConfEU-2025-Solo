@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <LangVersion>10.0</LangVersion>
+    <Nullable>enable</Nullable>
+
+    <Description>Parent 2 for ALC tests.</Description>
+    <Authors>Jordan Borean</Authors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SharedDep\SharedDep.csproj">
+        <SetConfiguration>Version=2.0.0.1;DefineConstants=NEW_VERSION</SetConfiguration>
+    </ProjectReference>
+  </ItemGroup>
+
+</Project>
