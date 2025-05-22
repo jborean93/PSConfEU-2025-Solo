@@ -1,0 +1,4 @@
+{
+    "pester.runTestsInNewProcess": true,
+    "powershell.pester.codeLens": false,
+}

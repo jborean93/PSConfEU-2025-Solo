@@ -15,7 +15,7 @@ public sealed class GetComplextTypeCommand : PSCmdlet
 {
     protected override void EndProcessing()
     {
-        WriteObject(new ComplexType() { PropertyDisplayKind = TomlPropertyDisplayKind.InlineTable });
+        WriteObject(new ComplexType() { PropertyDisplayKind = TomlPropertyDisplayKind.Default });
     }
 }
 

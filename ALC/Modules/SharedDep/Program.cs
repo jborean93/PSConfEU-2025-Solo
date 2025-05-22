@@ -2,12 +2,12 @@ namespace SharedDep;
 
 public static class SomeClass
 {
-    public static string GetValue()
+    public static string GetOldValue()
 
         => "Hello Old World!";
 
 #if NEW_VERSION
-    public static string GetValueNew()
+    public static string GetNewValue()
         => "Hello New World!";
 #endif
 }
