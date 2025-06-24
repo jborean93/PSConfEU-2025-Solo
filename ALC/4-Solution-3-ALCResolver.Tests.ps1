@@ -38,12 +38,14 @@ Describe "ALC Resolver Module example" {
     }
 
     It "The ALC from the pwsh exposed type is from the default ACL" {
-        [AssemblyLoadContext]::GetLoadContext([Tomlyn.Model.TomlPropertyDisplayKind].Assembly).Name | Should -Be Default
+        [AssemblyLoadContext]::GetLoadContext([Tomlyn.Model.TomlPropertyDisplayKind].Assembly).Name |
+            Should -Be Default
     }
 
     It "The ALC from the ALCResolver value is from the ALC Resolver ALC" {
         $val = Get-TomlPropertyDisplayKind NoInline
-        [AssemblyLoadContext]::GetLoadContext($val.GetType().Assembly).Name | Should -Be ALCResolver
+        [AssemblyLoadContext]::GetLoadContext($val.GetType().Assembly).Name |
+            Should -Be ALCResolver
     }
 
     It "Cannot access types in the ALCResolver.Private assembly" {

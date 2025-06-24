@@ -38,12 +38,14 @@ Describe "ALC Loader Module example" {
     }
 
     It "The ALC from the pwsh exposed type is from the default ACL" {
-        [AssemblyLoadContext]::GetLoadContext([Tomlyn.Model.TomlPropertyDisplayKind].Assembly).Name | Should -Be Default
+        [AssemblyLoadContext]::GetLoadContext([Tomlyn.Model.TomlPropertyDisplayKind].Assembly).Name |
+            Should -Be Default
     }
 
     It "The ALC from the ALCLoader value is from the ALC Loader ALC" {
         $val = Get-TomlPropertyDisplayKind NoInline
-        [AssemblyLoadContext]::GetLoadContext($val.GetType().Assembly).Name | Should -Be ALCLoader
+        [AssemblyLoadContext]::GetLoadContext($val.GetType().Assembly).Name |
+            Should -Be ALCLoader
     }
 
     It "Can reference types in the direct cmdlet assembly located in the ALC" {
@@ -54,13 +56,15 @@ Describe "ALC Loader Module example" {
     }
 
     It "The ALC LoadContext is still in the default ALC" {
-        [AssemblyLoadContext]::GetLoadContext([ALCLoader.Shared.LoadContext].Assembly).Name | Should -Be Default
+        [AssemblyLoadContext]::GetLoadContext([ALCLoader.Shared.LoadContext].Assembly).Name |
+            Should -Be Default
     }
 
     It "Can also access non-cmdlet types even in the ALCLoader assembly" {
         [ALCLoader.PublicTest]::TestPublicMethod() | Should -Be 'Hello from PublicTest!'
 
-        [AssemblyLoadContext]::GetLoadContext([ALCLoader.PublicTest].Assembly).Name | Should -Be ALCLoader
+        [AssemblyLoadContext]::GetLoadContext([ALCLoader.PublicTest].Assembly).Name |
+            Should -Be ALCLoader
     }
 
     It "Can share the input/output types in the cmdlet assembly" {

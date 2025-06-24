@@ -38,11 +38,13 @@ Describe "Script ALC Module example" {
     }
 
     It "The ALC from the pwsh exposed type is from the default ACL" {
-        [AssemblyLoadContext]::GetLoadContext([Tomlyn.Model.TomlPropertyDisplayKind].Assembly).Name | Should -Be Default
+        [AssemblyLoadContext]::GetLoadContext([Tomlyn.Model.TomlPropertyDisplayKind].Assembly).Name |
+            Should -Be Default
     }
 
     It "The ALC from the ScriptALC value is from the Script ALC" {
         $val = Get-TomlPropertyDisplayKind NoInline
-        [AssemblyLoadContext]::GetLoadContext($val.GetType().Assembly).Name | Should -Be ScriptAlc
+        [AssemblyLoadContext]::GetLoadContext($val.GetType().Assembly).Name |
+            Should -Be ScriptAlc
     }
 }

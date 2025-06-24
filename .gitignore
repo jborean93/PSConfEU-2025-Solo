@@ -236,6 +236,7 @@ ClientBin/
 *.dbproj.schemaview
 *.jfm
 *.pfx
+*.exe
 *.publishsettings
 orleans.codegen.cs
 
@@ -360,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Custom entries
+cert.pass

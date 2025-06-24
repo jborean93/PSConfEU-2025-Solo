@@ -21,7 +21,7 @@ else {
 # retrieve after. This example just stores it under the full type name but you
 # can add whatever logic to shorten or alias the name. Any types that were not
 # found will be raised as an error later on.
-$script:ALCTypes = @{}
+$Script:ALCTypes = @{}
 $unknownTypes = foreach ($typeName in @(
         'Tomlyn.Model.TomlPropertyDisplayKind'
     )) {
@@ -51,10 +51,16 @@ Function Get-TomlPropertyDisplayKind {
     )
 
     # We cannot refer to the type normally in PowerShell as pwsh will
-    # only look in the default LoadContext.
+    # only look in the default LoadContext. So this will not work:
+    # [Tomlyn.Model.TomlPropertyDisplayKind]::$Value
     # $Value -as [Tomlyn.Model.TomlPropertyDisplayKind]
-    # $ALCTypes['Tomlyn.Model.TomlPropertyDisplayKind']::$Value
+
+    # We instead use ALCTypes to get the Type object and cast
+    # from there like normal.
     $Value -as $ALCTypes['Tomlyn.Model.TomlPropertyDisplayKind']
+
+    # Another alternative
+    # $ALCTypes['Tomlyn.Model.TomlPropertyDisplayKind']::$Value
 }
 
 Export-ModuleMember -Function Get-TomlPropertyDisplayKind

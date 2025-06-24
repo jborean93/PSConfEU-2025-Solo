@@ -3,42 +3,15 @@ using namespace System.Collections.Generic
 using namespace System.IO
 using namespace System.Reflection
 
-[CmdletBinding()]
-param (
-    [Parameter()]
-    [IDictionary]
-    $Settings = @{}
-)
-
-# Just a simple way to validate and convert the settings hashtable to variables
-# without having to check the hashtable manually.
-. {
-    [CmdletBinding()]
-    param (
-        [Parameter()]
-        [switch]
-        $LogAssemblyLoad
-    )
-} @Settings
-
-$ModuleName = [Path]::GetFileNameWithoutExtension($PSCommandPath)
-
 Function Import-DotNetAssembly {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
         [string[]]
-        $Name,
-
-        [Parameter()]
-        [switch]
-        $LogAssemblyLoad
+        $Name
     )
 
     begin {
-        # Stores log messages for assembly resolution.
-        $log = [List[string]]::new()
-
         # Used to track assemblies that are already loaded.
         $existingAssemblies = [AppDomain]::CurrentDomain.GetAssemblies()
 
@@ -50,7 +23,6 @@ Function Import-DotNetAssembly {
                 [ResolveEventArgs]$e
             )
 
-            $log.Add("Resolving assembly: '$($e.Name)' for '$($e.RequestingAssembly.FullName)'")
             try {
                 # $e.Name is most likely the path specified to Add-Type. We try
                 # and parse it before checking if the file exists.
@@ -63,8 +35,6 @@ Function Import-DotNetAssembly {
                 $assemblyPath = $name.Name
                 $assemblyInfo = [AssemblyName]::GetAssemblyName($assemblyPath)
 
-                $log.Add("Processing module assembly requirement '$($assemblyInfo.FullName)'")
-
                 # We first check if that assembly is already loaded.
                 $existingAssembly = $existingAssemblies | Where-Object { $_.GetName().Name -eq $assemblyInfo.Name }
 
@@ -72,17 +42,14 @@ Function Import-DotNetAssembly {
                     # If the assembly is loaded we can't do much but use that even if the
                     # version doesn't meet our requirements. You could add a failure here
                     # if you want to fail explicitly otherwise hope for the best.
-                    $log.Add("Using existing loaded assembly '$($existingAssembly.FullName)' from '$($existingAssembly.Location)'")
                     return $existingAssembly
                 }
                 else {
                     # The assembly is not loaded so we load it from the path.
-                    $log.Add("Loading new assembly '$($assemblyInfo.FullName)' from '$assemblyPath'")
                     return [Assembly]::LoadFrom($assemblyPath)
                 }
             }
             catch {
-                $log.Add("Error resolving assembly: '$($e.Name)': $_")
                 return $null
             }
         }
@@ -92,18 +59,16 @@ Function Import-DotNetAssembly {
         [AppDomain]::CurrentDomain.add_AssemblyResolve($resolveDelegate)
     }
     process {
-        try {
-            foreach ($assembly in $Name) {
-                # Ensures we don't repeat the existing logs when trying a new assembly.
-                $log.Clear()
+        foreach ($assembly in $Name) {
+            try {
                 Add-Type -LiteralPath $assembly
             }
-        }
-        finally {
-            if ($LogAssemblyLoad) {
-                foreach ($entry in $log) {
-                    Write-Host "$ModuleName - $entry"
+            catch [FileLoadException] {
+                if ($_.Exception.HResult -eq 0x80131621) {
+                    # Already loaded, try and continue
+                    continue
                 }
+                throw
             }
         }
     }
@@ -120,7 +85,7 @@ Function Import-DotNetAssembly {
 # up to the main assemblies.
 $assemblyBin = [Path]::Combine($PSScriptRoot, 'bin')
 'SharedDep.dll', 'ParentDep2.dll' |
-    Import-DotNetAssembly -Name { [Path]::Combine($assemblyBin, $_) } -LogAssemblyLoad:$LogAssemblyLoad
+    Import-DotNetAssembly -Name { [Path]::Combine($assemblyBin, $_) }
 
 Function Get-OldValue {
     [ParentDep2.SomeClass]::GetOldValue()

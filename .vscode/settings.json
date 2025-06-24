@@ -1,4 +1,4 @@
 {
-    "pester.runTestsInNewProcess": true,
-    "powershell.pester.codeLens": false,
+    "powershell.pester.codeLens": true,
+    "powershell.debugging.createTemporaryIntegratedConsole": true
 }
