@@ -30,7 +30,9 @@ Invoke-Command -HostName localhost {
 # this transport without any files and while the objects exchanged
 # are serialized they are still objects
 Invoke-Command -HostName localhost {
-    . "$using:PSScriptRoot\New-ScheduledTaskSession.ps1"
+    param ($NewTaskCode)
+
+    . ([ScriptBlock]::Create($NewTaskCode))
 
     $session = New-ScheduledTaskSession
     Invoke-Command -Session $session -ScriptBlock {
@@ -40,19 +42,21 @@ Invoke-Command -HostName localhost {
         $wua.RebootRequired
     }
     $session | Remove-PSSession
-}
+} -ArgumentList (Get-Content .\New-ScheduledTaskSession.ps1 -Raw)
 
 # Looking at the whoami output we can see that this is running
 # as the same user but now with the BATCH logon
 Invoke-Command -HostName localhost {
-    . "$using:PSScriptRoot\New-ScheduledTaskSession.ps1"
+    param ($NewTaskCode)
+
+    . ([ScriptBlock]::Create($NewTaskCode))
 
     $session = New-ScheduledTaskSession
     Invoke-Command -Session $session -ScriptBlock {
         whoami /all
     }
     $session | Remove-PSSession
-}
+} -ArgumentList (Get-Content .\New-ScheduledTaskSession.ps1 -Raw)
 
 # Another problem is credential delegation, we cannot
 # access this network path without using CredSSP or
@@ -69,7 +73,9 @@ $item.FullName
 # With the scheduled task we can provide explicit credentials
 $targetCred = Get-Credential
 Invoke-Command -HostName localhost {
-    . "$using:PSScriptRoot\New-ScheduledTaskSession.ps1"
+    param ($NewTaskCode)
+
+    . ([ScriptBlock]::Create($NewTaskCode))
 
     $session = New-ScheduledTaskSession -Credential $using:targetCred
     Invoke-Command -Session $session -ScriptBlock {
@@ -77,4 +83,4 @@ Invoke-Command -HostName localhost {
         $item.FullName
     }
     $session | Remove-PSSession
-}
+} -ArgumentList (Get-Content .\New-ScheduledTaskSession.ps1 -Raw)

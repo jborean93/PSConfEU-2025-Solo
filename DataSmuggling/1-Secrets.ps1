@@ -1,7 +1,8 @@
 # Sharing through command line triggers auditing logs" {
 pwsh -Command "`$password = 'DoNotShare!' | ConvertTo-SecureString -AsPlainText -Force; (Get-PfxCertificate -FilePath '$PSScriptRoot\cert.pfx' -Password `$password).Subject"
 
-# Can also trigger scriptblock logging if certain keywords are used" {
+# Can also trigger scriptblock logging if certain keywords are used"
+# https://github.com/PowerShell/PowerShell/blob/9ec06ae798c5c8114f1ed4fb63513d69c4a777eb/src/System.Management.Automation/engine/runtime/CompiledScriptBlock.cs#L1820-L1965
 pwsh -Command "<# Properties #>`$password = 'DoNotShare!' | ConvertTo-SecureString -AsPlainText -Force; (Get-PfxCertificate -FilePath '$PSScriptRoot\cert.pfx' -Password `$password).Subject"
 
 # We can pass it through an env var to avoid ScriptBlock or cmdline auditing
@@ -25,9 +26,6 @@ pwsh {
 } | Out-String
 Pop-Location
 
-# You can see what happens when using {} as a command argument
-& "$PSScriptRoot\print_argv.exe" { 'foo' } | Out-String
-
 # Using Start-Job with a provided SecureString avoids all this
 $SecureStringPassword = Import-Clixml -LiteralPath "$PSScriptRoot\cert.pass"
 Start-Job -ScriptBlock {
@@ -35,3 +33,9 @@ Start-Job -ScriptBlock {
     $password = $using:SecureStringPassword
     (Get-PfxCertificate -FilePath "$using:PSScriptRoot\cert.pfx" -Password $password).Subject
 } | Receive-Job -Wait -AutoRemoveJob
+
+# You can use the minishell as well for a list of arguments
+# This is undocumented but it works
+pwsh {
+    (Get-PfxCertificate -FilePath $args[0] -Password $args[1]).Subject
+} -args "$PSScriptRoot\cert.pfx", $SecureStringPassword

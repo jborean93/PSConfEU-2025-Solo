@@ -4,7 +4,7 @@
 psexec.exe -accepteula -s pwsh.exe -Command '[Environment]::UserName'
 
 # Using the New-ScheduledTaskSession cmdlet can do it for you
-. "$PSScriptRoot\New-ScheduledTaskSession.ps1"
+. .\New-ScheduledTaskSession.ps1
 
 $session = New-ScheduledTaskSession -UserName SYSTEM
 Invoke-Command -Session $session -ScriptBlock {
@@ -34,9 +34,6 @@ try {
     Invoke-Command -Session $session -ScriptBlock {
         whoami /all
     }
-
-    # Enter-PSSession -Session $session
-    $a = ""
 }
 finally {
     if ($session) {
