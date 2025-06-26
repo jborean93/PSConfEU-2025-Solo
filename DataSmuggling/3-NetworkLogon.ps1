@@ -84,3 +84,19 @@ Invoke-Command -HostName localhost {
     }
     $session | Remove-PSSession
 } -ArgumentList (Get-Content .\New-ScheduledTaskSession.ps1 -Raw)
+
+# We can even abuse scheduled tasks to spawn an interactive
+# process from a network logon.
+<#
+Invoke-Command -HostName server2025.domain.test -ScriptBlock {
+    . D:\PSConfEU-2025-Solo\DataSmuggling\New-ScheduledTaskSession.ps1
+
+    $session = New-ScheduledTaskSession -Interactive
+    Invoke-Command -Session $session -ScriptBlock {
+        Start-Process -FilePath pwsh.exe -ArgumentList @(
+            '-NoExit -Command "whoami /all; ''All your bases belong to us''"'
+        )
+    }
+    $session | Remove-PSSession
+}
+#>

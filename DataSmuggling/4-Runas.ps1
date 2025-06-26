@@ -13,34 +13,18 @@ Invoke-Command -Session $session -ScriptBlock {
 $session | Remove-PSSession
 
 # If you wanted to become TrustedInstaller you can do a similar
-# thing with ProcessEx
-Import-Module -Name ProcessEx
+# thing with ProcessEx.
+. .\New-PwshProcessSession.ps1
 
 Start-Service -Name TrustedInstaller
 $tiPid = (Get-CimInstance -ClassName Win32_Service -Filter 'Name="TrustedInstaller"').ProcessId
-$startupInfo = New-StartupInfo -ParentProcess $tiPid -WindowStyle Hide
-$tiProc = Start-ProcessEx -FilePath pwsh.exe -StartupInfo $startupInfo -PassThru
-$session = $null
-try {
-    $connInfo = [System.Management.Automation.Runspaces.NamedPipeConnectionInfo]::new(
-        [int]$tiProc.ProcessId)
-    $runspace = [RunspaceFactory]::CreateRunspace($connInfo, $host, $null)
-    $runspace.Open()
-    $session = [System.Management.Automation.Runspaces.PSSession]::Create(
-        $runspace,
-        "TIProc",
-        $null)
 
-    Invoke-Command -Session $session -ScriptBlock {
-        whoami /all
-    }
+$session = New-PwshProcessSession -ParentProcessId $tiPid
+
+Invoke-Command -Session $session -ScriptBlock {
+    whoami /all
 }
-finally {
-    if ($session) {
-        $session | Remove-PSSession
-    }
-    $tiProc | Stop-Process -Force
-}
+$session | Remove-PSSession
 
 <#
 It can also do it interactively in a simpler way

@@ -3,7 +3,7 @@ pwsh -Command '$password = "DoNotShare!" | ConvertTo-SecureString -AsPlainText -
 
 # Can also trigger scriptblock logging if certain keywords are used"
 # https://github.com/PowerShell/PowerShell/blob/9ec06ae798c5c8114f1ed4fb63513d69c4a777eb/src/System.Management.Automation/engine/runtime/CompiledScriptBlock.cs#L1820-L1965
-pwsh -Command '<# Properties #>$password = "DoNotShare!" | ConvertTo-SecureString -AsPlainText -Force; (Get-PfxCertificate -FilePath ".\cert.pfx" -Password $password).Subject'
+pwsh -Command '<# Properties #> $password = "DoNotShare!" | ConvertTo-SecureString -AsPlainText -Force; (Get-PfxCertificate -FilePath ".\cert.pfx" -Password $password).Subject'
 
 # We can pass it through an env var to avoid ScriptBlock or cmdline auditing
 # but module logging will pick this up and the env vars can be scanned as well
@@ -36,4 +36,4 @@ Start-Job -ScriptBlock {
 # This is undocumented but it works
 pwsh {
     (Get-PfxCertificate -FilePath .\cert.pfx -Password $args[0]).Subject
-} -args $SecureStringPassword
+} -args $SecureStringPassword | Out-String

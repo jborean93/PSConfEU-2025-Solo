@@ -34,7 +34,6 @@ Function Start-SniffCapture {
         $Pattern
     )
 
-    $start = Get-Date
     $found = [HashSet[string]]::new()
 
     while ($true) {
@@ -43,6 +42,10 @@ Function Start-SniffCapture {
                 $procInfo = $_ | Get-ProcessEx
             }
             catch {
+                return
+            }
+
+            if (-not $procInfo.Environment) {
                 return
             }
 
